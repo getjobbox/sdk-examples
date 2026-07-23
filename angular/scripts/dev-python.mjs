@@ -87,7 +87,10 @@ spawnChild(
     '--proxy-config',
     'proxy.python.conf.json',
   ],
-  'ng-serve'
+  'ng-serve',
+  {
+    NG_CLI_ANALYTICS: 'false',
+  }
 )
 
 console.log(`JobBox Angular jobs demo (Python SDK) → http://127.0.0.1:${uiPort}`)

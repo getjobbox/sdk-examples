@@ -68,6 +68,7 @@ spawnChild(
   'ng-serve',
   {
     API_PORT: apiPort,
+    NG_CLI_ANALYTICS: 'false',
   }
 )
 
