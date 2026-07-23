@@ -1,0 +1,391 @@
+<div class="jobs-page">
+  <header class="hero-banner">
+    <div class="hero-banner-media" aria-hidden="true"></div>
+    <div class="hero-banner-scrim" aria-hidden="true"></div>
+    <div class="hero-banner-inner">
+      @if (pageTitle()) {
+        <p class="hero-section">{{ pageTitle() }}</p>
+      }
+      <h1>JobFinder</h1>
+
+      <label class="search">
+        <span class="sr-only">Search jobs</span>
+        <input
+          type="search"
+          placeholder="Search titles, companies…"
+          autocomplete="off"
+          [value]="search()"
+          (input)="onSearchInput($event)"
+        />
+        <ph-magnifying-glass
+          class="search-icon"
+          weight="bold"
+          size="18"
+          aria-hidden="true"
+        ></ph-magnifying-glass>
+      </label>
+
+      @if (showCategoryFilters()) {
+        <div class="categories" aria-label="Job categories">
+          @if (categoriesError()) {
+            <p class="categories-error">{{ categoriesError() }}</p>
+          } @else {
+            <button
+              type="button"
+              class="chip"
+              [class.active]="!category()"
+              (click)="selectCategory('')"
+            >
+              All
+            </button>
+            @for (item of visibleCategories(); track item.id || categorySlug(item)) {
+              <button
+                type="button"
+                class="chip"
+                [class.active]="category() === categorySlug(item)"
+                (click)="selectCategory(categorySlug(item))"
+              >
+                {{ categoryLabel(item) }}
+              </button>
+            }
+            @if (hasMoreCategories()) {
+              <button
+                type="button"
+                class="chip chip-more"
+                [attr.aria-expanded]="categoriesExpanded() ? 'true' : 'false'"
+                (click)="toggleCategoriesExpanded()"
+              >
+                {{ categoriesExpanded() ? 'Less' : 'More…' }}
+              </button>
+            }
+            @if (!categories().length) {
+              <p class="categories-empty">No categories yet.</p>
+            }
+          }
+        </div>
+      } @else {
+        <p class="category-lock">
+          Showing <strong>HR &amp; People</strong> roles only
+        </p>
+      }
+    </div>
+  </header>
+
+  <div class="page">
+    <section class="status" aria-live="polite">
+      @if (loading()) {
+        <p class="sr-only">Loading jobs…</p>
+      } @else if (error()) {
+        <p class="error">{{ error() }}</p>
+      } @else {
+        <p>
+          {{ total().toLocaleString() }} result{{ total() === 1 ? '' : 's' }}
+          @if (debouncedSearch()) {
+            for “{{ debouncedSearch() }}”
+          }
+          @if (showCategoryFilters() && category()) {
+            in {{ category() }}
+          }
+          @if (refreshing()) {
+            <span class="status-refresh"> · Updating…</span>
+          }
+        </p>
+      }
+    </section>
+
+    @if (loading()) {
+      <ul class="list" aria-busy="true" aria-label="Loading jobs">
+        @for (key of listSkeletonKeys; track key) {
+          <li class="card card-skel" aria-hidden="true">
+            <div class="card-body skel-card-body">
+              <div class="card-top">
+                <span class="skel skel-line skel-card-title"></span>
+                <span class="skel skel-line skel-card-company"></span>
+                <span class="skel skel-line skel-card-snippet"></span>
+                <span class="skel skel-line skel-card-snippet short"></span>
+                <div class="skel-card-badges">
+                  <span class="skel skel-card-badge"></span>
+                  <span class="skel skel-card-badge"></span>
+                  <span class="skel skel-card-badge"></span>
+                </div>
+              </div>
+              <span class="skel skel-card-cta"></span>
+            </div>
+          </li>
+        }
+      </ul>
+    } @else if (!error()) {
+      <ul class="list">
+        @for (job of jobs(); track job.id) {
+          <li
+            class="card"
+            role="button"
+            tabindex="0"
+            (click)="openJob(job)"
+            (keydown)="onCardKeydown($event, job)"
+          >
+            <div class="card-body">
+              <div class="card-top">
+                @if (jobLogo(job)) {
+                  <img
+                    class="card-logo"
+                    [src]="jobLogo(job)"
+                    [alt]="jobCompany(job) + ' logo'"
+                    width="40"
+                    height="40"
+                    loading="lazy"
+                  />
+                }
+                <h2>{{ jobTitle(job) }}</h2>
+                <p class="company">{{ jobCompany(job) }}</p>
+                @if (jobSnippet(job)) {
+                  <p class="card-snippet">{{ jobSnippet(job) }}</p>
+                }
+                @if (jobBadges(job).length) {
+                  <div class="card-badges">
+                    @for (badge of jobBadges(job); track badge.key) {
+                      <span class="card-badge" [attr.data-kind]="badge.key">
+                        @if (badge.icon) {
+                          @switch (badge.icon) {
+                            @case ('wifi-high') {
+                              <ph-wifi-high class="card-badge-icon" size="12" weight="bold" aria-hidden="true"></ph-wifi-high>
+                            }
+                            @case ('arrows-split') {
+                              <ph-arrows-split class="card-badge-icon" size="12" weight="bold" aria-hidden="true"></ph-arrows-split>
+                            }
+                            @case ('building-office') {
+                              <ph-building-office class="card-badge-icon" size="12" weight="bold" aria-hidden="true"></ph-building-office>
+                            }
+                            @case ('buildings') {
+                              <ph-buildings class="card-badge-icon" size="12" weight="bold" aria-hidden="true"></ph-buildings>
+                            }
+                          }
+                        }
+                        {{ badge.text }}
+                      </span>
+                    }
+                  </div>
+                }
+              </div>
+              <button type="button" class="card-cta" (click)="openJob(job); $event.stopPropagation()">
+                View Job
+              </button>
+            </div>
+          </li>
+        }
+        @if (jobs().length === 0) {
+          <li class="empty">No jobs matched.</li>
+        }
+      </ul>
+    }
+
+    <app-pagination
+      [currentPage]="page()"
+      [totalItems]="total()"
+      [itemsPerPage]="perPage"
+      [loading]="loading()"
+      (pageChange)="onPageChange($event)"
+    />
+
+    @if (modalOpen()) {
+      <div
+        class="modal-root"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="job-detail-title"
+        (click)="onModalBackdropClick($event)"
+      >
+        <div class="modal">
+          <header class="modal-head">
+            <div class="modal-title-block">
+              @if (detailLoading()) {
+                <div class="modal-head-row">
+                  <div class="skel skel-logo" aria-hidden="true"></div>
+                  <div class="modal-head-copy">
+                    <div class="skel skel-line skel-eyebrow" aria-hidden="true"></div>
+                    <div class="skel skel-line skel-title" aria-hidden="true"></div>
+                    <div class="skel skel-line skel-company" aria-hidden="true"></div>
+                  </div>
+                </div>
+                <h2 id="job-detail-title" class="sr-only">Loading job</h2>
+              } @else {
+                <div class="modal-head-row">
+                  @if (detailLogo()) {
+                    <img
+                      class="company-logo"
+                      [src]="detailLogo()"
+                      [alt]="jobCompany(detailJob()) + ' logo'"
+                      width="56"
+                      height="56"
+                    />
+                  }
+                  <div class="modal-head-copy">
+                    <p class="company">{{ jobCompany(detailJob()) }}</p>
+                    <h2 id="job-detail-title">{{ jobTitle(detailJob()) }}</h2>
+                  </div>
+                </div>
+              }
+            </div>
+            <button type="button" class="modal-close" aria-label="Close" (click)="closeModal()">
+              ×
+            </button>
+          </header>
+
+          <div class="modal-body" [attr.aria-busy]="detailLoading() ? 'true' : 'false'">
+            @if (detailLoading()) {
+              <div class="modal-skeleton" aria-live="polite" aria-label="Loading job">
+                <div class="overview-grid">
+                  <span class="skel skel-fact"></span>
+                  <span class="skel skel-fact"></span>
+                  <span class="skel skel-fact"></span>
+                  <span class="skel skel-fact"></span>
+                </div>
+                <div class="skel-section">
+                  <span class="skel skel-line skel-heading"></span>
+                  <span class="skel skel-line"></span>
+                  <span class="skel skel-line"></span>
+                  <span class="skel skel-line short"></span>
+                </div>
+                <div class="skel-spinner" aria-hidden="true">
+                  <span class="spinner"></span>
+                </div>
+              </div>
+            } @else if (detailError()) {
+              <p class="error">{{ detailError() }}</p>
+            } @else if (detailJob()) {
+              @if (detailFacts().length) {
+                <section class="modal-section">
+                  <h3 class="modal-section-title">Overview</h3>
+                  <div class="overview-grid">
+                    @for (row of detailFacts(); track row.key) {
+                      <div class="overview-item">
+                        <span class="overview-label">
+                          @switch (row.icon) {
+                            @case ('map-pin') {
+                              <ph-map-pin class="overview-icon" size="14" weight="bold" aria-hidden="true"></ph-map-pin>
+                            }
+                            @case ('globe') {
+                              <ph-globe class="overview-icon" size="14" weight="bold" aria-hidden="true"></ph-globe>
+                            }
+                            @case ('tag') {
+                              <ph-tag class="overview-icon" size="14" weight="bold" aria-hidden="true"></ph-tag>
+                            }
+                            @case ('wifi-high') {
+                              <ph-wifi-high class="overview-icon" size="14" weight="bold" aria-hidden="true"></ph-wifi-high>
+                            }
+                            @case ('arrows-split') {
+                              <ph-arrows-split class="overview-icon" size="14" weight="bold" aria-hidden="true"></ph-arrows-split>
+                            }
+                            @case ('building-office') {
+                              <ph-building-office class="overview-icon" size="14" weight="bold" aria-hidden="true"></ph-building-office>
+                            }
+                            @case ('buildings') {
+                              <ph-buildings class="overview-icon" size="14" weight="bold" aria-hidden="true"></ph-buildings>
+                            }
+                            @case ('trend-up') {
+                              <ph-trend-up class="overview-icon" size="14" weight="bold" aria-hidden="true"></ph-trend-up>
+                            }
+                            @case ('clock') {
+                              <ph-clock class="overview-icon" size="14" weight="bold" aria-hidden="true"></ph-clock>
+                            }
+                            @case ('clock-user') {
+                              <ph-clock-user class="overview-icon" size="14" weight="bold" aria-hidden="true"></ph-clock-user>
+                            }
+                            @case ('signature') {
+                              <ph-signature class="overview-icon" size="14" weight="bold" aria-hidden="true"></ph-signature>
+                            }
+                            @case ('graduation-cap') {
+                              <ph-graduation-cap class="overview-icon" size="14" weight="bold" aria-hidden="true"></ph-graduation-cap>
+                            }
+                            @case ('handshake') {
+                              <ph-handshake class="overview-icon" size="14" weight="bold" aria-hidden="true"></ph-handshake>
+                            }
+                            @case ('hourglass') {
+                              <ph-hourglass class="overview-icon" size="14" weight="bold" aria-hidden="true"></ph-hourglass>
+                            }
+                            @case ('briefcase') {
+                              <ph-briefcase class="overview-icon" size="14" weight="bold" aria-hidden="true"></ph-briefcase>
+                            }
+                            @case ('money') {
+                              <ph-money class="overview-icon" size="14" weight="bold" aria-hidden="true"></ph-money>
+                            }
+                            @case ('wallet') {
+                              <ph-wallet class="overview-icon" size="14" weight="bold" aria-hidden="true"></ph-wallet>
+                            }
+                            @case ('coins') {
+                              <ph-coins class="overview-icon" size="14" weight="bold" aria-hidden="true"></ph-coins>
+                            }
+                            @case ('check-circle') {
+                              <ph-check-circle class="overview-icon" size="14" weight="bold" aria-hidden="true"></ph-check-circle>
+                            }
+                          }
+                          {{ row.label }}
+                        </span>
+                        <span class="overview-value">{{ row.value }}</span>
+                      </div>
+                    }
+                  </div>
+                </section>
+              }
+
+              @if (detailDescriptionHtml()) {
+                <section class="modal-section prose-block">
+                  <h3 class="modal-section-title">Description</h3>
+                  <div class="prose" [innerHTML]="detailDescriptionHtml()"></div>
+                </section>
+              }
+
+              @if (detailRequirementsHtml()) {
+                <section class="modal-section prose-block">
+                  <h3 class="modal-section-title">Requirements</h3>
+                  <div class="prose" [innerHTML]="detailRequirementsHtml()"></div>
+                </section>
+              }
+
+              @if (detailTimeline().length) {
+                <section class="modal-section">
+                  <h3 class="modal-section-title">Timeline</h3>
+                  <div class="timeline-row">
+                    @for (row of detailTimeline(); track row.key) {
+                      <div class="timeline-item">
+                        <span class="timeline-label">
+                          @switch (row.icon) {
+                            @case ('calendar-blank') {
+                              <ph-calendar-blank class="timeline-icon" size="14" weight="bold" aria-hidden="true"></ph-calendar-blank>
+                            }
+                            @case ('arrows-clockwise') {
+                              <ph-arrows-clockwise class="timeline-icon" size="14" weight="bold" aria-hidden="true"></ph-arrows-clockwise>
+                            }
+                            @case ('clock') {
+                              <ph-clock class="timeline-icon" size="14" weight="bold" aria-hidden="true"></ph-clock>
+                            }
+                          }
+                          {{ row.label }}
+                        </span>
+                        <span class="timeline-value">{{ row.value }}</span>
+                      </div>
+                    }
+                  </div>
+                </section>
+              }
+            }
+          </div>
+
+          @if (!detailLoading() && !detailError() && detailJob() && detailApplyUrl()) {
+            <footer class="modal-foot">
+              <a
+                class="action-link primary"
+                [href]="detailApplyUrl()"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Apply on JobBox
+                <ph-arrow-square-out size="16" weight="bold" aria-hidden="true"></ph-arrow-square-out>
+              </a>
+            </footer>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</div>

@@ -1,0 +1,13 @@
+# Secrets — keep .env.example tracked
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# Dependencies & build
+node_modules/
+dist/
+
+# OS
+.DS_Store
+*.log
