@@ -1,6 +1,6 @@
 # JobBox React.js example
 
-Official React + Vite example for the JobBox partner SDKs — same JobFinder board as the [Vue example](../vue), built with React and React Router.
+Official React + Vite example for the JobBox partner SDKs - same JobFinder board as the [Vue example](../vue), built with React and React Router.
 
 The API key stays on the server. The browser only calls local `/api/*` routes.
 
@@ -39,9 +39,9 @@ Python API on `5177`, Vite UI on `5176`.
 |-------|------|----------|
 | `/` | All Jobs | `jobs.list` + category chips |
 | `/hr` | HR Jobs | `jobs.list({ category: 'hr' })` |
-| `GET /api/categories` | — | `jobs.categories()` |
-| `GET /api/jobs` | — | `jobs.list(...)` |
-| `GET /api/jobs/:id` | — | `jobs.get(id)` |
+| `GET /api/categories` | - | `jobs.categories()` |
+| `GET /api/jobs` | - | `jobs.list(...)` |
+| `GET /api/jobs/:id` | - | `jobs.get(id)` |
 
 ## Tests
 

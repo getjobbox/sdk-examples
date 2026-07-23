@@ -51,5 +51,5 @@ Health check: http://localhost:8080/api/health → `{ "ok": true, "sdk": "php", 
 ## Notes
 
 - Default port **8080** (Vue uses 5174).
-- `.env` is gitignored — never commit plaintext keys.
+- `.env` is gitignored - never commit plaintext keys.
 - Apply links open `{JOBBOX_APP_URL}/j/{id}` (no API key).

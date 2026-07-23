@@ -6,7 +6,7 @@ export const metadata = {
     default: 'JobFinder',
     template: '%s · JobFinder',
   },
-  description: 'JobBox Next.js SDK example — JobFinder board',
+  description: 'JobBox Next.js SDK example - JobFinder board',
 }
 
 export default function RootLayout({ children }) {

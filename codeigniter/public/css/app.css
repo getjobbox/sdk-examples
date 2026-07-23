@@ -814,7 +814,7 @@ code {
   backdrop-filter: blur(4px);
 }
 
-/* Author `display` beats the UA [hidden] rule — force hide when closed. */
+/* Author `display` beats the UA [hidden] rule - force hide when closed. */
 .modal-root[hidden],
 .modal-foot[hidden],
 .pager[hidden] {

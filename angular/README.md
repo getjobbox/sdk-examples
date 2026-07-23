@@ -1,6 +1,6 @@
 # JobBox Angular example
 
-Official Angular example for the JobBox partner SDKs — same JobFinder board as the [Vue](../vue) and [React](../react) examples.
+Official Angular example for the JobBox partner SDKs - same JobFinder board as the [Vue](../vue) and [React](../react) examples.
 
 Built with **Angular 19** standalone components, signals, `OnPush` change detection, a root `JobsStoreService`, and Phosphor web-component icons.
 

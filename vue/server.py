@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 API proxy for the Vue jobs demo using the Python getjobbox SDK.
-Same /api/* contract as server.mjs — run with: npm run dev:python
+Same /api/* contract as server.mjs - run with: npm run dev:python
 """
 
 from __future__ import annotations

@@ -1,5 +1,5 @@
 /**
- * JobFinder client — mirrors the Vue example's store + JobsView behaviour.
+ * JobFinder client - mirrors the Vue example's store + JobsView behaviour.
  * Talks only to local /api/* (PHP SDK holds JOBBOX_API_KEY on the server).
  */
 (function () {

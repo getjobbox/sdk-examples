@@ -1,6 +1,6 @@
 {
     "name": "jobbox/codeigniter-example",
-    "description": "JobBox PHP SDK example — CodeIgniter 4 job board (mirrors the Vue demo)",
+    "description": "JobBox PHP SDK example - CodeIgniter 4 job board (mirrors the Vue demo)",
     "license": "MIT",
     "type": "project",
     "require": {

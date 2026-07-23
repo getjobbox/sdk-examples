@@ -51,6 +51,6 @@ Health check: http://localhost:8081/api/health → `{ "ok": true, "sdk": "php", 
 ## Notes
 
 - Default port **8081** (CodeIgniter uses 8080).
-- `.env` is gitignored — never commit plaintext keys.
+- `.env` is gitignored - never commit plaintext keys.
 - Apply links open `{JOBBOX_APP_URL}/j/{id}` (no API key).
 - No database is required for the job board (session/cache default to `file` / `sync` in `.env.example`).
