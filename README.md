@@ -2,6 +2,8 @@
 
 Sample apps that show how to use the JobBox partner SDKs (Node, Python, and more) behind a small local API.
 
+**Full SDK docs:** [getjobbox.github.io/sdk](https://getjobbox.github.io/sdk/) · [Server-side pattern](https://getjobbox.github.io/sdk/guides/server-side-pattern/)
+
 ## Important: server-side only
 
 **Do not call the JobBox SDK or put `JOBBOX_API_KEY` in frontend code.**
