@@ -6,6 +6,19 @@
 
 # Dependencies
 node_modules/
+vendor/
+.next/
+
+# CodeIgniter writable runtime
+**/writable/cache/*
+!**/writable/cache/index.html
+**/writable/logs/*
+!**/writable/logs/index.html
+**/writable/session/*
+!**/writable/session/index.html
+**/writable/debugbar/*
+!**/writable/debugbar/index.html
+
 
 # Build output
 dist/
